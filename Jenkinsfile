@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker { image 'stefanscherer/python-windows:nano' } }
+    agent { docker { image 'python:3-windowsservercore' } }
     stages {
         stage('build') {
             steps {
