@@ -5,8 +5,10 @@ pipeline {
         stage('build') {
             steps {
                  withEnv(["HOME=${env.WORKSPACE}"]) {
-                    sh 'pip install --user -r requirements.txt'
-                    sh 'pytest -v -rs'
+                    sh """
+                    pip install --user -r requirements.txt
+                    pytest -v -rs
+                    """
                 }
             }
         }
