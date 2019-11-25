@@ -7,12 +7,13 @@ pipeline {
                  withEnv(["HOME=${env.WORKSPACE}"]) {
                     sh 'pip install --user -r requirements.txt'
                 }
-                
             }
         }
         stage('test') {
             steps {
-                sh 'pytest -v -rs'
+                withEnv(["HOME=${env.WORKSPACE}"]) {
+                    sh 'pytest -v -rs'
+                }
             }
         }
     }
