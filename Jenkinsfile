@@ -4,8 +4,11 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'python --version'
+                 withEnv(["HOME=${env.WORKSPACE}"]) {
+                    sh 'pip install --user -r requirements.txt'
+                    sh 'python -m pytest -v -rs'
+                }
             }
-        }
+        }       
     }
 }
