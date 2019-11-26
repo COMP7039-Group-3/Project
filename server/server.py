@@ -43,7 +43,7 @@ def api_bbc_news():
     global urls_list
     if (len(urls_list) == 0):
         urls_list = scrape_bbc_news(summaries_per_section=2, summarize_to_lines=2, save=False)
-    return jsonify(urls_list);
+    return jsonify(urls_list)
 
 
 @app.route("/fetch-bbc-news", methods=["POST"])

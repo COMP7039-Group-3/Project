@@ -18,14 +18,14 @@ def scrape_bbc_news(summaries_per_section=5, summarize_to_lines=3, save=True):
 
     #####################################################################################
 
-    empty_summaries_folder()
+    # empty_summaries_folder()
 
     for section in sections:
         urls = get_summaries(
             root_url, section, summaries_per_section, summarize_to_lines)
 
-        if (save):
-            save_to_json(urls, section)
+        # if (save):
+        #     save_to_json(urls, section)
         num_sections += 1
         num_summaries += len(urls)
         print(f"{section}: {str(len(urls))} articles summarized.")
@@ -34,5 +34,5 @@ def scrape_bbc_news(summaries_per_section=5, summarize_to_lines=3, save=True):
     print(
         f"\n✅  Summarized {num_summaries} articles in {num_sections} sections.\n")
 
-    save_to_json(urls_list, "news")
+    # save_to_json(urls_list, "news")
     return urls_list
