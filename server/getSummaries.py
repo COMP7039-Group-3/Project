@@ -14,6 +14,11 @@ def get_bbc_article(url):
         return_text = return_text + paragraph.text + "\n"
     return return_text
 
+def get_summary_from_article(article_title, article_body, num_lines):
+    if(len(article_body) > 0 and num_lines > 0):
+        return "\n".join(summarize(article_title, article_body, num_lines))
+    else:
+        return ""
 
 def get_summaries(root_url, section, count=5, summarize_to_lines=5):
     main_url = root_url + "/" + section
@@ -39,8 +44,7 @@ def get_summaries(root_url, section, count=5, summarize_to_lines=5):
                 print(f"  ❌  Url already processed: {url}")
             else:
                 article_body = get_bbc_article(url)
-                summary = "\n".join(
-                    summarize(title, article_body, summarize_to_lines))
+                summary = get_summary_from_article(title, article_body, summarize_to_lines)
                 article_words = len(article_body.split())
                 summary_words = len(summary.split())
                 urls.append({"url": url, "title": title, "summary": summary, "article": article_body,
