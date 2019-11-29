@@ -14,15 +14,18 @@ def get_bbc_article(url):
         return_text = return_text + paragraph.text + "\n"
     return return_text
 
+def get_html_from_source(main_url):
+    result = requests.get(main_url)
+    return result.content
 
 def get_summaries(root_url, section, count=5, summarize_to_lines=5):
     main_url = root_url + "/" + section
-    result = requests.get(main_url)
-    src = result.content
+    src = get_html_from_source(main_url)
     soup = BeautifulSoup(src, features="html.parser")
     urls = []
     bodies = soup.findAll("div", {"class": "gs-c-promo-body"})
-    bodies.pop(0)  # Repeated item
+    if(bodies):
+        bodies.pop(0)  # Repeated item
 
     print("\nGetting summaries for: " + section + " ...")
     for body in bodies[:count]:
