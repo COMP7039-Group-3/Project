@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 from summarizer import summarize
 
-
 def get_bbc_article(url):
     return_text = ""
     new_result = requests.get(url)
@@ -14,13 +13,25 @@ def get_bbc_article(url):
         return_text = return_text + paragraph.text + "\n"
     return return_text
 
+
+def guardian_get_article(url):
+    return_text = ""
+    new_result = requests.get(url)
+    new_src = new_result.content
+    new_soup = BeautifulSoup(new_src, features="html.parser")
+    new_body = new_soup.find("div", {"itemprop": "articleBody"})
+    paragraphs = new_body.findAll("p")
+    for paragraph in paragraphs:
+        return_text = return_text + paragraph.text + "\n"
+    return return_text
+
 def get_summary_from_article(article_title, article_body, num_lines):
     if(len(article_body) > 0 and num_lines > 0):
         return "\n".join(summarize(article_title, article_body, num_lines))
     else:
         return ""
 
-def get_summaries(root_url, section, count=5, summarize_to_lines=5):
+def bbc_get_summaries(root_url, section, count=5, summarize_to_lines=5):
     main_url = root_url + "/" + section
     result = requests.get(main_url)
     src = result.content
@@ -55,3 +66,5 @@ def get_summaries(root_url, section, count=5, summarize_to_lines=5):
             pass
 
     return urls
+
+#def setup_summaries(page):
