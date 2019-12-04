@@ -22,7 +22,8 @@ def static_proxy(path):
 
 @app.route("/")
 def client():
-    return send_from_directory('./dist/', 'index.html')
+    return render_template('index.html')
+    # return send_from_directory('./dist/', 'index.html')
 
 
 @app.route("/bbc-news")
