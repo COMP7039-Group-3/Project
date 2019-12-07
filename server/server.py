@@ -23,7 +23,8 @@ def static_proxy(path):
 
 @app.route("/")
 def client():
-    return send_from_directory('./dist/', 'index.html')
+    return render_template('index.html')
+    # return send_from_directory('./dist/', 'index.html')
 
 
 @app.route("/bbc-news")
@@ -44,7 +45,7 @@ def api_bbc_news():
     global urls_list
     if (len(urls_list) == 0):
         urls_list = scrape_bbc_news(summaries_per_section=2, summarize_to_lines=2, save=False)
-    return jsonify(urls_list);
+    return jsonify(urls_list)
 
 
 @app.route("/fetch-bbc-news", methods=["POST"])
