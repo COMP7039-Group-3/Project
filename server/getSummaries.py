@@ -2,72 +2,190 @@ import requests
 from bs4 import BeautifulSoup
 from summarizer import summarize
 
-def get_bbc_article(url):
-    return_text = ""
-    new_result = requests.get(url)
-    new_src = new_result.content
-    new_soup = BeautifulSoup(new_src, features="html.parser")
-    new_body = new_soup.find("div", {"property": "articleBody"})
+# Functionality
+
+# 
+# Params:
+# (String)      Origin URL - url of the news page
+# (Soup-type)   HTML of the content to analyse
+# Returns:
+# Valid input   String with article content
+# Invalid input None
+#
+def get_article_title(url, soup):
+    if ("bbc.com" in url
+    or "bbc.co.uk" in url):
+        title = soup.find("h3", {"property": "articleBody"})
+    if ("theguardian.com" in url):
+        title = soup.find("h1", {"itemprop": "articleBody"})
+
+    # returns None if title is not assigned
+    # https://stackoverflow.com/a/15300733
+    return title 
+
+# 
+# Params:
+# (String)      Origin URL - url of the news page
+# (Soup-type)   HTML of the content to analyse
+# Returns:
+# Valid input   String with article content
+# Invalid input None
+#
+def get_article_content(url, soup):
+    article = ""
+    
+    if ("bbc.com" in url
+    or "bbc.co.uk" in url):
+        new_body = soup.find("div", {"property": "articleBody"})
+    if ("theguardian.com" in url):
+        new_body = soup.find("div", {"itemprop": "articleBody"})
+    
     paragraphs = new_body.findAll("p")
     for paragraph in paragraphs:
-        return_text = return_text + paragraph.text + "\n"
-    return return_text
+        article = article + paragraph.text + "\n"
 
+    if(len(article) > 0):
+        return article
+    return None
 
-def guardian_get_article(url):
-    return_text = ""
-    new_result = requests.get(url)
-    new_src = new_result.content
-    new_soup = BeautifulSoup(new_src, features="html.parser")
-    new_body = new_soup.find("div", {"itemprop": "articleBody"})
-    paragraphs = new_body.findAll("p")
-    for paragraph in paragraphs:
-        return_text = return_text + paragraph.text + "\n"
-    return return_text
+# 
+# Params:
+# (Soup-type)   HTML of the content to analyse
+# Returns:
+# Valid input   String with link reference
+# Invalid input None
+#
+def get_article_link(soup):
+    link = soup.find("a")
+    return link.attrs['href']
 
-def get_summary_from_article(article_title, article_body, num_lines):
-    if(len(article_body) > 0 and num_lines > 0):
-        return "\n".join(summarize(article_title, article_body, num_lines))
-    else:
-        return ""
-def get_html_from_source(main_url):
-    result = requests.get(main_url)
-    return result.content
+# 
+# Params:
+# (String)          Origin URL - url of the news page
+# (Number:Optional) Number of links to capture
+# Returns:
+# Valid input       List of urls
+#
+def get_article_url_list(url, count=5):
+    soup = http_get_soup(url)
+    # Sets will ensure all urls are unique
+    urls = set()
+    root_url = identify_root_url(url)
 
-def bbc_get_summaries(root_url, section, count=5, summarize_to_lines=5):
-    main_url = root_url + "/" + section
-    src = get_html_from_source(main_url)
-    soup = BeautifulSoup(src, features="html.parser")
-    urls = []
-    bodies = soup.findAll("div", {"class": "gs-c-promo-body"})
+    if ("bbc.com" in url):
+        bodies = soup.findAll("div", {"class": "gs-c-promo-body"})
+    if ("theguardian.com" in url):
+        bodies = soup.findAll("div", {"class": "fc-item__container"})
     if(bodies):
         bodies.pop(0)  # Repeated item
 
-    print("\nGetting summaries for: " + section + " ...")
     for body in bodies[:count]:
-        title = body.find("h3").text
-        text = body.find("p")
-        link = body.find("a")
-        url = link.attrs['href']
-        try:
-            if (url.startswith("/")):
-                url = root_url + url
-
-            found = next((x for x in urls if x['url'] == url), None)
-            if (found != None):
-                print(f"  ❌  Url already processed: {url}")
-            else:
-                article_body = get_bbc_article(url)
-                summary = get_summary_from_article(title, article_body, summarize_to_lines)
-                article_words = len(article_body.split())
-                summary_words = len(summary.split())
-                urls.append({"url": url, "title": title, "summary": summary, "article": article_body,
-                             "article_words": article_words, "summary_words": summary_words})
-                print(f"  ✅  Got summary for article: {url}")
-        except:
-            print(f" 💀  Failed on url: {url}")
-            pass
-
+        url = get_article_link(body)
+        
+        # fix URI which might have relative reference
+        # <a href="/new-uri">
+        # <a href="./new-uri">
+        if (url.startswith("/") or url.startswith("./")):
+            url = root_url + "/" + url
+        
+        urls.add(url)
     return urls
 
-#def setup_summaries(page):
+#
+# Visits a section, finds list of links and obtains
+# article content 
+#
+# Params:
+# (String)      URL - url of the news page
+# Returns:
+# Valid input   List of articles
+#
+def get_articles_from_section(section_url):
+    url_list = get_article_url_list(section_url)
+    articles = []
+
+    for url in url_list:
+        articles.append(get_article(url))
+    return articles
+
+#
+# Visits an article page, obtains
+# - article title 
+# - article content 
+#
+# Params:
+# (String)      URL - url of the news page
+# Returns:
+# Valid input   article
+#    
+def get_article(url):
+    html = http_get_soup(url)
+    title = get_article_title(url, html)
+    text = get_article_content(url, html)
+    result = { "title": title, "article": text, "url": url }
+    return result
+
+#
+# Uses smmry to create a short summary of an article
+#
+# Params:
+# (Article)     Article object
+# Returns:
+# Valid input   Summary of the article as per smmry lib
+# Invalid input None
+#    
+def summary_from_article(article):
+    title = article[title]
+    text = article[text]
+        
+    if(len(text) > 0):
+        return "\n".join(summarize(title, text, len(text)))
+    return None
+
+#
+# Uses smmry to create a short summary of an article
+#
+# Params:
+# (String)      Origin URL - url of the news page
+# (Article)     Article object
+# Returns:
+# None; instead outputs file
+#    
+def save_article_to_file(url, article):
+    news_page = identify_root_url(url)
+    title = article[title]
+    file_name = news_page + title
+    to_file("file_name.json", article)
+    return
+
+def save_article_w_summary_to_file(url, article):
+    summary = summary_from_article(article)
+    summary_wordcount = len(summary.split())
+    summed_article = { "url": url, "article": article, "summary": summary, "summary_wordcount": summary_wordcount }
+
+    news_page = identify_root_url(url)
+    title = article[title]
+    file_name = news_page + title + "_summarised"
+    to_file("file_name.json", summed_article)
+    return
+
+# Utils
+def http_get_soup(url):
+    result = requests.get(url)
+    return soup_from_html(result.content)
+
+def soup_from_html(html):
+    return BeautifulSoup(html, features="html.parser")
+
+def identify_root_url(url):
+    if ("bbc.com" in url
+    or "bbc.co.uk" in url):
+        return "https://bbc.com"
+    if ("theguardian.com" in url):
+        return "https://theguardian.com"
+    return None
+
+def to_file(target_location, text):
+    with open(target_location, "w") as file:
+        file.write(text)
+        file.close()
