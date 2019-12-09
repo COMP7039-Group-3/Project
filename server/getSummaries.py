@@ -1,27 +1,65 @@
 import requests
 from bs4 import BeautifulSoup
 from summarizer import summarize
+from saveToJson import to_file
 
-# Functionality
+# Definitions #
+
+class Article:
+    def __init__(self, url, title, text):
+        self.url = url
+        self.title = title
+        self.text = text
+    def text_wordcount(self):
+        return self.text.split(" ")
+    def toJSON(self):
+        return {"url": self.url, "title": self.title, "text": self.text}
+
+# Functionality #
 
 # 
 # Params:
 # (String)      Origin URL - url of the news page
 # (Soup-type)   HTML of the content to analyse
 # Returns:
-# Valid input   String with article content
+# Valid input   String with page content
 # Invalid input None
 #
-def get_article_title(url, soup):
+def get_article_title(url, soup, debug=False):
     if ("bbc.com" in url
     or "bbc.co.uk" in url):
-        title = soup.find("h3", {"property": "articleBody"})
-    if ("theguardian.com" in url):
-        title = soup.find("h1", {"itemprop": "articleBody"})
+        if(debug):
+            print("Found bbc domain")
+            print(f"DEBUG: {soup.find('h2', {'class': 'unit__title'})}")
+        
+        tag = soup.find("h1", {"class": "story-body__h1"})
+        # Blogs look different
+        if tag is None:
+            if(debug):
+                print("Trying blog pattern")
+            tag = soup.find("h2", {"class": "unit__title"}).find("span")
+        # Media pages look different
+        if tag is None:
+            if(debug):
+                print("Trying media page pattern")
+            tag = soup.find("h1", {"class": "vxp-media__headline"})
+        # More weird blogs // fallback
+        if tag is None:
+            tag = soup.find("h1")
+        title = tag.text
 
+    if ("theguardian.com" in url):
+        if(debug):
+            print("Found guardian domain")
+        tag = soup.find("h1", {"itemprop": "articleBody"})
+        title = tag.text
     # returns None if title is not assigned
     # https://stackoverflow.com/a/15300733
-    return title 
+
+    if(debug):
+        print(f"DEBUG: Title : {tag}")
+
+    return title
 
 # 
 # Params:
@@ -31,22 +69,33 @@ def get_article_title(url, soup):
 # Valid input   String with article content
 # Invalid input None
 #
-def get_article_content(url, soup):
-    article = ""
-    
+def get_article_content(url, soup, debug=False):    
+    # Please don't ask me why this is now different than before
+    article = None
+   
+    if(debug):
+        print(url)
+
     if ("bbc.com" in url
     or "bbc.co.uk" in url):
+        if(debug):
+            print("Found bbc domain")
         new_body = soup.find("div", {"property": "articleBody"})
+        # Media pages look different
+        if new_body is None:
+            new_body = soup.find("div", {"class": "vxp-media__summary"})
+
     if ("theguardian.com" in url):
+        if(debug):
+            print("Found guardian domain")
         new_body = soup.find("div", {"itemprop": "articleBody"})
     
     paragraphs = new_body.findAll("p")
     for paragraph in paragraphs:
+        if article is None:
+            article = ""
         article = article + paragraph.text + "\n"
-
-    if(len(article) > 0):
-        return article
-    return None
+    return article
 
 # 
 # Params:
@@ -105,7 +154,9 @@ def get_articles_from_section(section_url):
     articles = []
 
     for url in url_list:
-        articles.append(get_article(url))
+        article = get_article(url, True).toJSON()
+        if article is not None:
+            articles.append(article)
     return articles
 
 #
@@ -118,12 +169,22 @@ def get_articles_from_section(section_url):
 # Returns:
 # Valid input   article
 #    
-def get_article(url):
+def get_article(url, debug=False):
     html = http_get_soup(url)
-    title = get_article_title(url, html)
-    text = get_article_content(url, html)
-    result = { "title": title, "article": text, "url": url }
-    return result
+    
+    if(debug):
+        # print(html)
+        print(url)
+    
+    title = get_article_title(url, html, debug)
+    text = get_article_content(url, html, debug)
+    if(title == None):
+        print(f"ERROR: could not get title of article @ URI {url}")
+        return None
+    if(text == None):
+        print(f"ERROR: could not get text of article @ URI {url}")
+        return None
+    return Article(url, title, text)
 
 #
 # Uses smmry to create a short summary of an article
@@ -135,39 +196,9 @@ def get_article(url):
 # Invalid input None
 #    
 def summary_from_article(article):
-    title = article[title]
-    text = article[text]
-        
-    if(len(text) > 0):
-        return "\n".join(summarize(title, text, len(text)))
-    return None
-
-#
-# Uses smmry to create a short summary of an article
-#
-# Params:
-# (String)      Origin URL - url of the news page
-# (Article)     Article object
-# Returns:
-# None; instead outputs file
-#    
-def save_article_to_file(url, article):
-    news_page = identify_root_url(url)
-    title = article[title]
-    file_name = news_page + title
-    to_file("file_name.json", article)
-    return
-
-def save_article_w_summary_to_file(url, article):
-    summary = summary_from_article(article)
-    summary_wordcount = len(summary.split())
-    summed_article = { "url": url, "article": article, "summary": summary, "summary_wordcount": summary_wordcount }
-
-    news_page = identify_root_url(url)
-    title = article[title]
-    file_name = news_page + title + "_summarised"
-    to_file("file_name.json", summed_article)
-    return
+    if(len(article.text) > 0):
+        summary = summarize(article.title, article.text)
+    return summary
 
 # Utils
 def http_get_soup(url):
@@ -185,7 +216,28 @@ def identify_root_url(url):
         return "https://theguardian.com"
     return None
 
-def to_file(target_location, text):
-    with open(target_location, "w") as file:
-        file.write(text)
-        file.close()
+#
+# Uses smmry to create a short summary of an article
+#
+# Params:
+# (String)      Origin URL - url of the news page
+# (Article)     Article object
+# Returns:
+# None; instead outputs file
+#    
+def save_article_to_file(url, article):
+    news_page = identify_root_url(url)
+    file_name = news_page + article.title
+    to_file("file_name.json", article)
+
+def save_article_w_summary_to_file(url, article):
+
+    print("Save the following article" + str(article.title))
+
+    summary = summary_from_article(article)
+    summary_wordcount = len(summary.split())
+    summed_article = { "url": url, "article": article, "summary": summary, "summary_wordcount": summary_wordcount }
+
+    news_page = identify_root_url(url)
+    file_name = news_page + article.title + "_summarised"
+    to_file("file_name.json", summed_article)
