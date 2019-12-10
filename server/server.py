@@ -43,8 +43,10 @@ def api_news(site):
 # @app.route("/api/bbc-news")
 def api_bbc_news():
     global urls_list
+    root_url = "https://www.bbc.com"
+    sections = ["news/world", "news/business", "news/technology", "news/science_and_environment"]
     if (len(urls_list) == 0):
-        urls_list = scrape_bbc_news(summaries_per_section=2, summarize_to_lines=2, save=False)
+        urls_list = scrape_bbc_news(root_url, sections)
     return jsonify(urls_list)
 
 
@@ -54,10 +56,12 @@ def fetch_bbc_news():
     global urls_list
     loading = True
     urls_list = []
+    root_url = "https://www.bbc.com"
+    sections = ["news/world", "news/business", "news/technology", "news/science_and_environment"]
+
     render_template('bbc_news.html', urls_list=[], loading=True)
 
-    urls_list = scrape_bbc_news(summaries_per_section=5,
-                                summarize_to_lines=5, save=False)
+    urls_list = scrape_bbc_news(root_url, sections)
     loading = False
     print(f"Rendering {len(urls_list)} urls")
     return render_template('bbc_news.html', urls_list=urls_list, loading=False)
