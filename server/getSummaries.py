@@ -15,6 +15,19 @@ class Article:
     def toJSON(self):
         return {"url": self.url, "title": self.title, "text": self.text}
 
+class ArticleWithSum:
+    def __init__(self, url, title, text, summary):
+        self.url = url
+        self.title = title
+        self.text = text
+        self.summary = summary
+    def text_wordcount(self):
+        return self.text.split(" ")
+    def text_wordcount(self):
+        return self.summary.split(" ")
+    def toJSON(self):
+        return {"url": self.url, "title": self.title, "text": self.text, "summary": self.summary}
+
 # Functionality #
 
 # 
@@ -51,7 +64,15 @@ def get_article_title(url, soup, debug=False):
     if ("theguardian.com" in url):
         if(debug):
             print("Found guardian domain")
-        tag = soup.find("h1", {"itemprop": "articleBody"})
+        tag = soup.find("h1", {"itemprop": "headline"})
+        title = tag.text
+
+    if ("reuters.com" in url):
+        if(debug):
+            print("Found reuters domain")
+        tag = soup.find("h1", {"class": "ArticleHeader_headline"})
+        if tag is None:
+            tag = soup.find("h2", {"class": "FeedItemHeadline_headline"})
         title = tag.text
     # returns None if title is not assigned
     # https://stackoverflow.com/a/15300733
@@ -89,7 +110,18 @@ def get_article_content(url, soup, debug=False):
         if(debug):
             print("Found guardian domain")
         new_body = soup.find("div", {"itemprop": "articleBody"})
+        if new_body is None:
+            new_body = soup.find("div", {"class": "content__article-body"})
+        if new_body is None:
+            new_body = soup.find("div", {"data-component": "standfirst"})
     
+    if ("reuters.com" in url):
+        if(debug):
+            print("Found reuters domain")
+        new_body = soup.find("div", {"class": "StandardArticleBody_body"})
+        if new_body is None:
+            new_body = soup.find("p", {"class": "FeedItemLede_lede"})
+
     paragraphs = new_body.findAll("p")
     for paragraph in paragraphs:
         if article is None:
@@ -147,17 +179,29 @@ def get_article_url_list(url, count=5):
 # Params:
 # (String)      URL - url of the news page
 # Returns:
-# Valid input   List of articles
+# Valid input   List of articles in JSON format
 #
 def get_articles_from_section(section_url):
     url_list = get_article_url_list(section_url)
     articles = []
 
     for url in url_list:
-        article = get_article(url, True).toJSON()
+        article = get_article(url).toJSON()
         if article is not None:
             articles.append(article)
     return articles
+
+def get_articles_from_section_w_sum(section_url):
+    url_list = get_article_url_list(section_url)
+    articles = []
+
+    for url in url_list:
+        article = get_article(url)
+        summary = summary_from_article(article).toJSON()
+        if summary is not None:
+            articles.append(summary)
+    return articles
+
 
 #
 # Visits an article page, obtains
@@ -195,10 +239,12 @@ def get_article(url, debug=False):
 # Valid input   Summary of the article as per smmry lib
 # Invalid input None
 #    
-def summary_from_article(article):
+def summary_from_article(article, debug=False):
+    if(debug):
+        print(article.text)
     if(len(article.text) > 0):
-        summary = summarize(article.title, article.text)
-    return summary
+        summary_text = summarize(article.title, article.text)
+    return ArticleWithSum(article.url, article.title, article.text, summary_text)
 
 # Utils
 def http_get_soup(url):
@@ -214,6 +260,8 @@ def identify_root_url(url):
         return "https://bbc.com"
     if ("theguardian.com" in url):
         return "https://theguardian.com"
+    if ("reuters.com" in url):
+        return "https://reuters.com"
     return None
 
 #
@@ -234,7 +282,7 @@ def save_article_w_summary_to_file(url, article):
 
     print("Save the following article" + str(article.title))
 
-    summary = summary_from_article(article)
+    summary = summary_from_article(article, True)
     summary_wordcount = len(summary.split())
     summed_article = { "url": url, "article": article, "summary": summary, "summary_wordcount": summary_wordcount }
 
