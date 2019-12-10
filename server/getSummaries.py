@@ -5,15 +5,19 @@ from saveToJson import to_file
 
 # Definitions #
 
+
 class Article:
     def __init__(self, url, title, text):
         self.url = url
         self.title = title
         self.text = text
+
     def text_wordcount(self):
         return self.text.split(" ")
+
     def toJSON(self):
         return {"url": self.url, "title": self.title, "text": self.text}
+
 
 class ArticleWithSum:
     def __init__(self, url, title, text, summary):
@@ -21,16 +25,19 @@ class ArticleWithSum:
         self.title = title
         self.text = text
         self.summary = summary
+
     def text_wordcount(self):
         return self.text.split(" ")
+
     def text_wordcount(self):
         return self.summary.split(" ")
+
     def toJSON(self):
         return {"url": self.url, "title": self.title, "text": self.text, "summary": self.summary}
 
 # Functionality #
 
-# 
+#
 # Params:
 # (String)      Origin URL - url of the news page
 # (Soup-type)   HTML of the content to analyse
@@ -38,13 +45,15 @@ class ArticleWithSum:
 # Valid input   String with page content
 # Invalid input None
 #
+
+
 def get_article_title(url, soup, debug=False):
     if ("bbc.com" in url
-    or "bbc.co.uk" in url):
+            or "bbc.co.uk" in url):
         if(debug):
             print("Found bbc domain")
             print(f"DEBUG: {soup.find('h2', {'class': 'unit__title'})}")
-        
+
         tag = soup.find("h1", {"class": "story-body__h1"})
         # Blogs look different
         if tag is None:
@@ -82,7 +91,7 @@ def get_article_title(url, soup, debug=False):
 
     return title
 
-# 
+#
 # Params:
 # (String)      Origin URL - url of the news page
 # (Soup-type)   HTML of the content to analyse
@@ -90,15 +99,17 @@ def get_article_title(url, soup, debug=False):
 # Valid input   String with article content
 # Invalid input None
 #
-def get_article_content(url, soup, debug=False):    
+
+
+def get_article_content(url, soup, debug=False):
     # Please don't ask me why this is now different than before
     article = None
-   
+
     if(debug):
         print(url)
 
     if ("bbc.com" in url
-    or "bbc.co.uk" in url):
+            or "bbc.co.uk" in url):
         if(debug):
             print("Found bbc domain")
         new_body = soup.find("div", {"property": "articleBody"})
@@ -114,7 +125,7 @@ def get_article_content(url, soup, debug=False):
             new_body = soup.find("div", {"class": "content__article-body"})
         if new_body is None:
             new_body = soup.find("div", {"data-component": "standfirst"})
-    
+
     if ("reuters.com" in url):
         if(debug):
             print("Found reuters domain")
@@ -129,24 +140,28 @@ def get_article_content(url, soup, debug=False):
         article = article + paragraph.text + "\n"
     return article
 
-# 
+#
 # Params:
 # (Soup-type)   HTML of the content to analyse
 # Returns:
 # Valid input   String with link reference
 # Invalid input None
 #
+
+
 def get_article_link(soup):
     link = soup.find("a")
     return link.attrs['href']
 
-# 
+#
 # Params:
 # (String)          Origin URL - url of the news page
 # (Number:Optional) Number of links to capture
 # Returns:
 # Valid input       List of urls
 #
+
+
 def get_article_url_list(url, count=5):
     soup = http_get_soup(url)
     # Sets will ensure all urls are unique
@@ -157,30 +172,34 @@ def get_article_url_list(url, count=5):
         bodies = soup.findAll("div", {"class": "gs-c-promo-body"})
     if ("theguardian.com" in url):
         bodies = soup.findAll("div", {"class": "fc-item__container"})
+    # Add Reuters and Washington Post here
+
     if(bodies):
         bodies.pop(0)  # Repeated item
 
     for body in bodies[:count]:
         url = get_article_link(body)
-        
+
         # fix URI which might have relative reference
         # <a href="/new-uri">
         # <a href="./new-uri">
         if (url.startswith("/") or url.startswith("./")):
             url = root_url + "/" + url
-        
+
         urls.add(url)
     return urls
 
 #
 # Visits a section, finds list of links and obtains
-# article content 
+# article content
 #
 # Params:
 # (String)      URL - url of the news page
 # Returns:
 # Valid input   List of articles in JSON format
 #
+
+
 def get_articles_from_section(section_url):
     url_list = get_article_url_list(section_url)
     articles = []
@@ -190,6 +209,7 @@ def get_articles_from_section(section_url):
         if article is not None:
             articles.append(article)
     return articles
+
 
 def get_articles_from_section_w_sum(section_url):
     url_list = get_article_url_list(section_url)
@@ -205,21 +225,21 @@ def get_articles_from_section_w_sum(section_url):
 
 #
 # Visits an article page, obtains
-# - article title 
-# - article content 
+# - article title
+# - article content
 #
 # Params:
 # (String)      URL - url of the news page
 # Returns:
 # Valid input   article
-#    
+#
 def get_article(url, debug=False):
     html = http_get_soup(url)
-    
+
     if(debug):
         # print(html)
         print(url)
-    
+
     title = get_article_title(url, html, debug)
     text = get_article_content(url, html, debug)
     if(title == None):
@@ -238,7 +258,9 @@ def get_article(url, debug=False):
 # Returns:
 # Valid input   Summary of the article as per smmry lib
 # Invalid input None
-#    
+#
+
+
 def summary_from_article(article, debug=False):
     if(debug):
         print(article.text)
@@ -247,16 +269,20 @@ def summary_from_article(article, debug=False):
     return ArticleWithSum(article.url, article.title, article.text, summary_text)
 
 # Utils
+
+
 def http_get_soup(url):
     result = requests.get(url)
     return soup_from_html(result.content)
 
+
 def soup_from_html(html):
     return BeautifulSoup(html, features="html.parser")
 
+
 def identify_root_url(url):
     if ("bbc.com" in url
-    or "bbc.co.uk" in url):
+            or "bbc.co.uk" in url):
         return "https://bbc.com"
     if ("theguardian.com" in url):
         return "https://theguardian.com"
@@ -272,11 +298,14 @@ def identify_root_url(url):
 # (Article)     Article object
 # Returns:
 # None; instead outputs file
-#    
+#
+
+
 def save_article_to_file(url, article):
     news_page = identify_root_url(url)
     file_name = news_page + article.title
     to_file("file_name.json", article)
+
 
 def save_article_w_summary_to_file(url, article):
 
@@ -284,7 +313,8 @@ def save_article_w_summary_to_file(url, article):
 
     summary = summary_from_article(article, True)
     summary_wordcount = len(summary.split())
-    summed_article = { "url": url, "article": article, "summary": summary, "summary_wordcount": summary_wordcount }
+    summed_article = {"url": url, "article": article,
+                      "summary": summary, "summary_wordcount": summary_wordcount}
 
     news_page = identify_root_url(url)
     file_name = news_page + article.title + "_summarised"
