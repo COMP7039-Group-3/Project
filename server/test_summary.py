@@ -23,7 +23,8 @@ class TestServerScraping(unittest.TestCase):
         """
         TC01	Verify that an empty string is returned when an empty source is provided.
         """
-        res = getSummaries.get_summary_from_article("", "", 5)
+        empty_article = getSummaries.Article("", "", "")
+        res = getSummaries.summary_from_article(empty_article, 5)
         self.assertEqual(res, '')
 
 
@@ -31,8 +32,9 @@ class TestServerScraping(unittest.TestCase):
         """
         TC02	Verify that the result is equals or smaller than the source 
         """
-        res = getSummaries.get_summary_from_article(example_title, example_news, 5)
-        self.assertGreaterEqual(len(example_news), len(res))
+        mock_article = getSummaries.Article("", example_title, example_news)
+        res = getSummaries.summary_from_article(mock_article, 5)
+        self.assertGreaterEqual(len(example_news), len(res.summary))
 
 
 
