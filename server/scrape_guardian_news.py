@@ -8,4 +8,5 @@ def scrape_guardian_news(root_url, sections):
     articles = scrapeAndSum(root_url, sections)
     to_file("theguardian.json", articles)
 
-scrape_guardian_news(root_url, sections)
+if __name__ == '__main__':
+    scrape_guardian_news(root_url, sections)

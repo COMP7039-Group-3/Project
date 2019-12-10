@@ -8,4 +8,5 @@ def scrape_reuters_news(root_url, sections):
     articles = scrape(root_url, sections)
     to_file("reuters.json", articles)
 
-scrape_reuters_news(root_url, sections)
+if __name__ == '__main__':
+    scrape_reuters_news(root_url, sections)

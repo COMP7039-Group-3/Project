@@ -12,4 +12,5 @@ def scrape_bbc_newsAndSave(root_url, sections):
     articles = scrapeAndSum(root_url, sections)
     to_file("bbc.json", articles)
 
-scrape_bbc_news(root_url, sections)
+if __name__ == '__main__':
+    scrape_bbc_news(root_url, sections)
