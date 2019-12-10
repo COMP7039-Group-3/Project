@@ -1,13 +1,13 @@
 from getSummaries import get_articles_from_section, get_articles_from_section_w_sum
 
-def scrape(root_url, sections):
+def scrape(root_url, sections, debug=False):
     num_sections = 0
     num_articles = 0
     scraped_page_articles = []
 
     for section in sections:
         constructed_url = root_url + "/" + section
-        articles = get_articles_from_section(constructed_url)
+        articles = get_articles_from_section(constructed_url, debug)
         
         num_sections += 1
         num_articles = len(articles)
@@ -17,14 +17,14 @@ def scrape(root_url, sections):
 
     return scraped_page_articles
 
-def scrapeAndSum(root_url, sections, summaries_per_section=5, summarize_to_lines=3):
+def scrapeAndSum(root_url, sections, summaries_per_section=5, summarize_to_lines=3, debug=False):
     num_sections = 0
     num_articles = 0
     scraped_page_articles = []
 
     for section in sections:
         constructed_url = root_url + "/" + section
-        articles = get_articles_from_section_w_sum(constructed_url)
+        articles = get_articles_from_section_w_sum(constructed_url, debug)
 
         num_sections += 1
         num_articles = len(articles)

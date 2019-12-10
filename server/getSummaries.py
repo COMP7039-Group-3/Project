@@ -147,16 +147,18 @@ def get_article_link(soup):
 # Returns:
 # Valid input       List of urls
 #
-def get_article_url_list(url, count=5):
+def get_article_url_list(url, count=5, debug=False):
     soup = http_get_soup(url)
     # Sets will ensure all urls are unique
     urls = set()
-    root_url = identify_root_url(url)
+    root_url = identify_root_url(url, debug)
 
     if ("bbc.com" in url):
         bodies = soup.findAll("div", {"class": "gs-c-promo-body"})
     if ("theguardian.com" in url):
         bodies = soup.findAll("div", {"class": "fc-item__container"})
+    if ("reuters.com" in url):
+        bodies = soup.findAll("article", {"class": "story"})
     if(bodies):
         bodies.pop(0)  # Repeated item
 
@@ -181,7 +183,7 @@ def get_article_url_list(url, count=5):
 # Returns:
 # Valid input   List of articles in JSON format
 #
-def get_articles_from_section(section_url):
+def get_articles_from_section(section_url, debug=False):
     url_list = get_article_url_list(section_url)
     articles = []
 
@@ -254,7 +256,7 @@ def http_get_soup(url):
 def soup_from_html(html):
     return BeautifulSoup(html, features="html.parser")
 
-def identify_root_url(url):
+def identify_root_url(url, debug=False):
     if ("bbc.com" in url
     or "bbc.co.uk" in url):
         return "https://bbc.com"
