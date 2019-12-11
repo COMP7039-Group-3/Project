@@ -1,5 +1,8 @@
 __pycache__
 .pytest_cache
 .vscode
+client/dist
+client/node_modules
+dist
 node_modules
 test

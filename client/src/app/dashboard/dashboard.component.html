@@ -1,0 +1,33 @@
+<div class="grid-container">
+  <ng-container *ngIf="sectionsBbc && sectionsBbc.length > 0; else loading">
+    <mat-accordion *ngFor="let section of sections">
+      <h1 [class.disabled]="!section.articles || section.articles.length === 0">
+        {{ section.section }}
+        <small>({{ section.articles.length }} articles)</small>
+      </h1>
+
+      <mat-expansion-panel *ngFor="let article of section.articles">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ article.title }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-list-item><h2>Summary</h2></mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>{{ article.summary }}</mat-list-item>
+
+        <mat-list-item><h2>Full Article</h2></mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>{{ article.text }}</mat-list-item>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </ng-container>
+</div>
+
+<ng-template #loading>
+  <h2>
+    Scrapping news
+  </h2>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template>
