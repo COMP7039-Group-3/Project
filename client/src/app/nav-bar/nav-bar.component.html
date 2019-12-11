@@ -27,11 +27,7 @@
         (click)="selectSource('reuters')"
         >Reuters</a
       >
-      <a
-        mat-list-item
-        [class.list-item-active]="source === 'washington'"
-        aria-disabled="true"
-      >
+      <a mat-list-item [class.disabled]="true" aria-disabled="true">
         <!-- (click)="selectSource('washington')" -->
         Washington Post
       </a>
