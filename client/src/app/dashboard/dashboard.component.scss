@@ -22,4 +22,9 @@
 
 h1 {
   text-transform: capitalize;
+  &.disabled {
+    color: #ccc !important;
+    // font-style: italic;
+    pointer-events: none;
+  }
 }
