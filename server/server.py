@@ -103,6 +103,7 @@ def fetch_bbc():
     global loading
     global urls_list_bbc
 
+    urls_list_bbc = scrape_bbc()
     return render_template('bbc.html', urls_list=urls_list_bbc, loading=False)
 
 
