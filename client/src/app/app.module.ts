@@ -22,6 +22,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
 import { FormComponent } from "./form/form.component";
 import { NavBarComponent } from "./nav-bar/nav-bar.component";
 import { MatExpansionModule } from "@angular/material/expansion";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { MatExpansionModule } from "@angular/material/expansion";
     MatFormFieldModule,
     MatExpansionModule,
     MatGridListModule,
+    MatProgressBarModule,
     MatIconModule,
     MatInputModule,
     MatInputModule,

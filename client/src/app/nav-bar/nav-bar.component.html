@@ -6,14 +6,34 @@
     [attr.role]="'navigation'"
     [mode]="'side'"
   >
-    <!-- [opened]="(isHandset$ | async) === false" -->
-    <!-- [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" -->
-    <!-- [mode]="(isHandset$ | async) ? 'over' : 'side'" -->
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item href="#">Link 1</a>
-      <a mat-list-item href="#">Link 2</a>
-      <a mat-list-item href="#">Link 3</a>
+      <a
+        mat-list-item
+        [class.list-item-active]="selectedSource === 'bbc'"
+        (click)="selectSource('bbc')"
+        >BBC News</a
+      >
+      <a
+        mat-list-item
+        [class.list-item-active]="selectedSource === 'guardian'"
+        (click)="selectSource('guardian')"
+      >
+        The Guardian
+      </a>
+      <a
+        mat-list-item
+        [class.list-item-active]="selectedSource === 'reuters'"
+        (click)="selectSource('reuters')"
+        >Reuters</a
+      >
+      <a
+        mat-list-item
+        [class.list-item-active]="selectedSource === 'washington'"
+        (click)="selectSource('washington')"
+      >
+        Washington Post
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -24,7 +44,6 @@
         mat-icon-button
         (click)="drawer.toggle()"
       >
-        <!-- *ngIf="isHandset$ | async" -->
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>News Summarizer</span>
@@ -37,6 +56,7 @@
             placeholder="Search news"
             formControlName="search"
             autocomplete="off"
+            [attr.disabled]="true"
           />
         </mat-form-field>
         <button mat-icon-button aria-label="Search" type="submit">

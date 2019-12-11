@@ -1,61 +1,33 @@
 <div class="grid-container">
-  <h1 class="mat-h1">News</h1>
-  <mat-grid-list cols="2" *ngIf="sections$ | async as sections; else loading">
-    <mat-grid-tile *ngFor="let section of sections$ | async" [colspan]="1">
-      <mat-card class="dashboard-card">
-        <mat-card-header>
-          <mat-card-title>
-            {{ section.section }}
-          </mat-card-title>
-          <mat-card-subtitle
-            ><small
-              >({{ section.urls.length }} articles)</small
-            ></mat-card-subtitle
-          >
-        </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
-          <!-- <mat-grid-list cols="2">
-            <mat-grid-tile *ngFor="let url of section.urls" [colspan]="1">
-              <mat-card class="dashboard-card">
-                <mat-card-header>
-                  <mat-card-title>
-                    <a [href]="url.url" class="mat-h4">{{ url.title }}</a>
-                  </mat-card-title>
-                </mat-card-header>
-                <mat-card-content class="dashboard-card-content">
-                  <div>Article words: {{ url.article_words }}</div>
-                  <div>Summary words: {{ url.summary_words }}</div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-          </mat-grid-list> -->
+  <ng-container *ngIf="sectionsBbc && sectionsBbc.length > 0; else loading">
+    <mat-accordion *ngFor="let section of sections">
+      <h1>
+        {{ section.section }}
+        <small>({{ section.articles.length }} articles)</small>
+      </h1>
 
-          <mat-accordion>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  Day of the trip
-                </mat-panel-title>
-                <mat-panel-description>
-                  Inform the date you wish to travel
-                  <mat-icon>date_range</mat-icon>
-                </mat-panel-description>
-              </mat-expansion-panel-header>
+      <mat-expansion-panel *ngFor="let article of section.articles">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ article.title }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-              <mat-action-row>
-                <button mat-button color="warn">Previous</button>
-                <button mat-button color="primary">End</button>
-              </mat-action-row>
-            </mat-expansion-panel>
-          </mat-accordion>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
+        <mat-list-item><h2>Summary</h2></mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>{{ article.summary }}</mat-list-item>
+
+        <mat-list-item><h2>Full Article</h2></mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>{{ article.text }}</mat-list-item>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </ng-container>
 </div>
 
 <ng-template #loading>
   <h2>
-    Loading stuff...
+    Scrapping news
   </h2>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </ng-template>

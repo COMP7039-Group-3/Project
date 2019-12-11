@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 from summarizer import summarize
 from saveToJson import to_file
 
+# Definitions #
+
 
 class Article:
     def __init__(self, url, title, text):
@@ -175,7 +177,6 @@ def get_article_url_list(url, count=5):
     if(bodies):
         bodies.pop(0)  # Repeated item
 
-    print("\nGetting summaries for: " + section + " ...")
     for body in bodies[:count]:
         url = get_article_link(body)
 

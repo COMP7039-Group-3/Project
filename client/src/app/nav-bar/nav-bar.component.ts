@@ -3,6 +3,7 @@ import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { Observable } from "rxjs";
 import { map, shareReplay } from "rxjs/operators";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { NewsService } from "../services/news.service";
 
 @Component({
   selector: "app-nav-bar",
@@ -10,6 +11,10 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
   styleUrls: ["./nav-bar.component.scss"]
 })
 export class NavBarComponent implements OnInit {
+  get selectedSource() {
+    return this.newsService.selectedSource$.getValue();
+  }
+
   formGroup: FormGroup;
 
   isHandset$: Observable<boolean> = this.breakpointObserver
@@ -21,7 +26,8 @@ export class NavBarComponent implements OnInit {
 
   constructor(
     private breakpointObserver: BreakpointObserver,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private newsService: NewsService
   ) {}
 
   ngOnInit(): void {
@@ -32,5 +38,9 @@ export class NavBarComponent implements OnInit {
     this.formGroup = this.formBuilder.group({
       search: []
     });
+  }
+
+  public selectSource(source: string) {
+    this.newsService.selectedSource$.next(source);
   }
 }

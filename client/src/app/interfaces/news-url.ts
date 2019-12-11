@@ -1,5 +1,5 @@
 export interface NewsUrl {
-  article: string;
+  text: string;
   article_words: number;
   summary: string;
   summary_words: string;

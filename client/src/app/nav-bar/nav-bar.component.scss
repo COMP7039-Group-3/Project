@@ -1,3 +1,12 @@
+@import "~@angular/material/theming";
+// @import "./material.icons";
+@include mat-core();
+
+$primary: mat-palette($mat-blue-grey, 700);
+// $accent: mat-palette($mat-deep-orange, 500, A100, A400);
+$accent: mat-palette($mat-purple, 500, A100, A400);
+$warn: mat-palette($mat-red, 600);
+
 .sidenav-container {
   height: 100%;
 }
@@ -18,4 +27,9 @@
 
 .form-container {
   padding: 20px 0 0 20px;
+}
+
+.list-item-active {
+  font-weight: bold;
+  color: mat-color($accent, darker) !important;
 }

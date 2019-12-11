@@ -1,6 +1,6 @@
-import { NewsUrl } from "./news-url";
+import { NewsUrl as Article } from "./news-url";
 
 export interface Section {
   section: string;
-  urls: NewsUrl[];
+  articles: Article[];
 }
