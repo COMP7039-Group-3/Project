@@ -5,7 +5,6 @@ from saveToJson import to_file
 
 # Definitions #
 
-
 class Article:
     def __init__(self, url, title, text):
         self.url = url
@@ -161,7 +160,6 @@ def get_article_link(soup):
 # Valid input       List of urls
 #
 
-
 def get_article_url_list(url, count=5, debug=False):
     soup = http_get_soup(url)
     # Sets will ensure all urls are unique
@@ -191,6 +189,7 @@ def get_article_url_list(url, count=5, debug=False):
         urls.add(url)
     return urls
 
+                  
 #
 # Visits a section, finds list of links and obtains
 # article content
@@ -201,7 +200,7 @@ def get_article_url_list(url, count=5, debug=False):
 # Valid input   List of articles in JSON format
 #
 
-
+                  
 def get_articles_from_section(section_url, debug=False):
     url_list = get_article_url_list(section_url)
     articles = []
@@ -282,7 +281,7 @@ def http_get_soup(url):
 def soup_from_html(html):
     return BeautifulSoup(html, features="html.parser")
 
-
+                  
 def identify_root_url(url, debug=False):
     if ("bbc.com" in url
             or "bbc.co.uk" in url):
@@ -322,3 +321,5 @@ def save_article_w_summary_to_file(url, article):
     news_page = identify_root_url(url)
     file_name = news_page + article.title + "_summarised"
     to_file("file_name.json", summed_article)
+
+
