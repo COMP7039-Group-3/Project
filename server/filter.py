@@ -81,9 +81,32 @@ mock_result = [
 def filter_by_category(article_list, section):
     if(section == "" or section == None):
         return article_list
-        
+
     result = []
     for art in article_list:
         if art["section"] == section:
             result.append(art)
+    return result
+
+def filter_by_word(article_list, words):
+    if type(words) != list:
+        raise Exception("You need to provide a list of words")
+        return article_list
+
+    if(words == None or len(words) <= 0):
+        return article_list
+
+    result = []
+    for art in article_list:
+        if art["articles"]:
+            for single_article in art["articles"]:
+                article_text = single_article["text"]
+                matches = False
+                for word in words:
+                    if word in article_text:
+                        matches = True
+
+                if matches:
+                    result.append(single_article)
+    print(article_list)
     return result
