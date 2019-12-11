@@ -14,9 +14,10 @@ def mock_get_html_from_fake(root_url):
 
 def try_object_matches_appropriate_format(res):
     json_res = json.loads(res.data)[0]
-    url_content = json_res['urls'][0]
-    return 'section' in json_res and 'urls' in json_res and 'article' in url_content and 'article_words' in url_content and 'summary' in url_content and 'summary_words' in url_content and 'title' in url_content and 'url' in url_content
-
+    article_list = json_res["articles"]
+    single_article = article_list[0]
+    return 'summary' in single_article and 'text' in single_article and 'title' in single_article and 'url' in single_article 
+    
 
 class TestServerScraping(unittest.TestCase):
     """
