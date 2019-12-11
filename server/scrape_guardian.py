@@ -15,3 +15,7 @@ def scrape_guardian_and_save():
     articles = scrape_guardian()
     to_file("guardian.json", articles)
     return articles
+
+
+if __name__ == '__main__':
+    scrape_guardian_news(root_url, sections)

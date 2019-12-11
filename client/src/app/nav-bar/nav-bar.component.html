@@ -10,28 +10,29 @@
     <mat-nav-list>
       <a
         mat-list-item
-        [class.list-item-active]="selectedSource === 'bbc'"
+        [class.list-item-active]="source === 'bbc'"
         (click)="selectSource('bbc')"
         >BBC News</a
       >
       <a
         mat-list-item
-        [class.list-item-active]="selectedSource === 'guardian'"
+        [class.list-item-active]="source === 'guardian'"
         (click)="selectSource('guardian')"
       >
         The Guardian
       </a>
       <a
         mat-list-item
-        [class.list-item-active]="selectedSource === 'reuters'"
+        [class.list-item-active]="source === 'reuters'"
         (click)="selectSource('reuters')"
         >Reuters</a
       >
       <a
         mat-list-item
-        [class.list-item-active]="selectedSource === 'washington'"
-        (click)="selectSource('washington')"
+        [class.list-item-active]="source === 'washington'"
+        aria-disabled="true"
       >
+        <!-- (click)="selectSource('washington')" -->
         Washington Post
       </a>
     </mat-nav-list>
@@ -46,7 +47,7 @@
       >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>News Summarizer</span>
+      <span>{{ selectedTitle }}</span>
     </mat-toolbar>
     <form [formGroup]="formGroup">
       <div class="form-container">

@@ -14,7 +14,7 @@ export class DashboardComponent implements OnInit {
   public sectionsBbc: Section[] = [];
   public sectionsGuardian: Section[] = [];
   public sectionsReuters: Section[] = [];
-  public sectionsWashington: Section[] = [];
+  // public sectionsWashington: Section[] = [];
 
   get selectedSource() {
     return this.newsService.selectedSource$.getValue();
@@ -26,7 +26,7 @@ export class DashboardComponent implements OnInit {
   constructor(private newsService: NewsService) {}
 
   ngOnInit(): void {
-    this.selectedSource = "bbc";
+    // this.selectedSource = "bbc";
 
     this.newsService.selectedSource$.subscribe(source => {
       this.onSourceSelected(source);
@@ -34,7 +34,10 @@ export class DashboardComponent implements OnInit {
 
     forkJoin([
       this.newsService.getSectionsBbc().pipe(
-        tap(sections => (this.sectionsBbc = sections)),
+        tap(sections => {
+          this.sectionsBbc = sections;
+          this.selectedSource = "bbc";
+        }),
         catchError(err => {
           console.warn(`Error scrapping Bbc news`, { err });
           return [];
@@ -53,16 +56,16 @@ export class DashboardComponent implements OnInit {
           console.warn(`Error scrapping Reuters news`, { err });
           return [];
         })
-      ),
-      this.newsService.getSectionsWashington().pipe(
-        tap(
-          sections => (this.sectionsWashington = sections),
-          catchError(err => {
-            console.warn(`Error scrapping Washington news`, { err });
-            return [];
-          })
-        )
       )
+      // this.newsService.getSectionsWashington().pipe(
+      //   tap(
+      //     sections => (this.sectionsWashington = sections),
+      //     catchError(err => {
+      //       console.warn(`Error scrapping Washington news`, { err });
+      //       return [];
+      //     })
+      //   )
+      // )
     ])
       .toPromise()
       .then(res => {
@@ -81,9 +84,9 @@ export class DashboardComponent implements OnInit {
       case "reuters":
         this.sections = this.sectionsReuters;
         break;
-      case "washington":
-        this.sections = this.sectionsWashington;
-        break;
+      // case "washington":
+      //   this.sections = this.sectionsWashington;
+      //   break;
 
       default:
         break;

@@ -11,8 +11,19 @@ import { NewsService } from "../services/news.service";
   styleUrls: ["./nav-bar.component.scss"]
 })
 export class NavBarComponent implements OnInit {
-  get selectedSource() {
-    return this.newsService.selectedSource$.getValue();
+  public source: string = "";
+  get selectedTitle() {
+    switch (this.source) {
+      case "bbc":
+        return "BBC News";
+      case "guardian":
+        return "The Guardian";
+      case "reuters":
+        return "Reuters";
+      case "washington":
+        return "Washington Post";
+    }
+    return "";
   }
 
   formGroup: FormGroup;
@@ -32,6 +43,10 @@ export class NavBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.createForm();
+
+    this.newsService.selectedSource$.subscribe(
+      source => (this.source = source)
+    );
   }
 
   createForm() {
