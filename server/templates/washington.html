@@ -1,14 +1,14 @@
 {% extends "layout.html" %} {% block content %}
 
 <div class="jumbotron ">
-  <h1 class="display-5">Guardian News Summaries <small>{{ urls_list|length }} sections.</small></h1>
+  <h1 class="display-5">Washington Post Summaries <small>{{ urls_list|length }} sections.</small></h1>
 
   {% if urls_list|length == 0 %}
-  <form action="/fetch-guardian" method="post">
-    <button type="submit" class="btn btn-primary" href="/fetch-guardian">
+  <form action="/washington" method="post">
+    <button type="submit" class="btn btn-primary" href="/washington">
       {% if loading %}
       <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-      Loading ... {% else %} Load Guardian News Articles {% endif %}
+      Loading ... {% else %} Load Washington Post Articles {% endif %}
     </button>
   </form>
   {% endif %}
