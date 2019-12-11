@@ -5,7 +5,6 @@ from saveToJson import to_file
 
 # Definitions #
 
-
 class Article:
     def __init__(self, url, title, text):
         self.url = url
@@ -178,6 +177,7 @@ def get_article_url_list(url, count=5, debug=False):
     if(bodies):
         bodies.pop(0)  # Repeated item
 
+    print("\nGetting summaries for: " + section + " ...")
     for body in bodies[:count]:
         url = get_article_link(body)
 
@@ -319,3 +319,4 @@ def save_article_w_summary_to_file(url, article):
     news_page = identify_root_url(url)
     file_name = news_page + article.title + "_summarised"
     to_file("file_name.json", summed_article)
+

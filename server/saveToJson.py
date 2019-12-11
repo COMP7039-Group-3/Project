@@ -23,7 +23,8 @@ def empty_summaries_folder():
         except Exception as e:
             print(e)
 
-def save_urls_to_json(url_list, path):
+
+def save_to_json(urls, path):
     file_name = "summaries/bbc_"+"_".join(path.split("/")) + ".json"
     with open(file_name, 'w') as outfile:
-        json.dump(url_list, outfile, indent=2)
+        json.dump(urls, outfile, indent=2)

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, abort, send_from_directory
 from flask_cors import CORS
+
 from scrape_bbc import scrape_bbc, scrape_bbc_and_save
 from scrape_guardian import scrape_guardian, scrape_guardian_and_save
 from scrape_reuters import scrape_reuters, scrape_reuters_and_save
