@@ -177,7 +177,7 @@ def get_article_url_list(url, count=5, debug=False):
     if(bodies):
         bodies.pop(0)  # Repeated item
 
-    print("\nGetting summaries for: " + section + " ...")
+    # print("\nGetting summaries for: " + section + " ...")
     for body in bodies[:count]:
         url = get_article_link(body)
 
