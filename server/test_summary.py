@@ -25,7 +25,7 @@ class TestServerScraping(unittest.TestCase):
         """
         empty_article = getSummaries.Article("", "", "")
         res = getSummaries.summary_from_article(empty_article, 5)
-        self.assertEqual(res, '')
+        self.assertEqual(res.summary, '')
 
 
     def test_summary_should_be_equal_or_smaller(self):

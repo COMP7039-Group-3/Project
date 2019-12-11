@@ -240,6 +240,7 @@ def get_article(url, debug=False):
 # Invalid input None
 #    
 def summary_from_article(article, debug=False):
+    summary_text = ""
     if(debug):
         print(article.text)
     if(len(article.text) > 0):
